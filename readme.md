@@ -177,14 +177,27 @@ const tokenizer = (input) => {
     const currentChar = input[current];
 
     // Now, we test for the types of each character.
-
     // We check for Whitespaces first
     // Regex to check for whitespace
     const WHITESPACE = /\s+/;
     if (WHITESPACE.test(currentChar)) {
       // If the current character is a whitespace, we skip over it.
       current++; // Go to the next character
-      continue; // Skip everything that is left in the loop and go to the next iteration
+      continue; // Skip everything and go to the next iteration
+    }
+
+    // We check for semicolons now. They tell us that we are at the end.
+    if (currentChar === ';') {
+      // If the current character is a semicolon, we create a `token`
+      let token = {
+        type: 'semi',
+        value: ';',
+      };
+
+      // then add it to the `tokens` array
+      tokens.push(token);
+      current++; // Go to the next character
+      continue; // Skip everything and go to the next iteration
     }
   }
 };
