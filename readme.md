@@ -129,9 +129,9 @@ Now that we have our new AST, we can now generate our code. Our new AST has ever
 
 Now that's it. A general idea of compilers and how they work. Not all compilers work like this but most certainly do. That's backbone and skeleton of our compiler. If our compiler was a website, all the above will be the HTML.
 
-Let's write some code.
+Let's write some code. 😋
 
-> _PS: We won't use any external libraries, we will write everything from scratch😺. Also, you must have [Node.js](https://nodejs.org) installed on your local system. Use any text editor or IDE of your choice._
+> _We won't use any external libraries, we will write everything from scratch😺. Also, you must have [Node.js](https://nodejs.org) installed on your local system. Use any text editor or IDE of your choice._
 
 Create a new directory and run `npm init -y` and create a new javascript file with any filename of your choice.
 
@@ -186,8 +186,11 @@ const tokenizer = (input) => {
       continue; // Skip everything and go to the next iteration
     }
 
-    // We check for semicolons now. They tell us that we are at the end.
-    if (currentChar === ';') {
+    // We need semicolons They tell us that we are at the end.
+    // We check for semicolons now and also if the semicolon is at the last position
+    // We only need the semicolons at the end. Any other position means there
+    // An error
+    if (currentChar === ';' && currentChar === input[input.length - 1]) {
       // If the current character is a semicolon, we create a `token`
       let token = {
         type: 'semi',
@@ -198,6 +201,55 @@ const tokenizer = (input) => {
       tokens.push(token);
       current++; // Go to the next character
       continue; // Skip everything and go to the next iteration
+    }
+  }
+};
+```
+
+We now have check in place for semicolons and whitespaces but there are four more to go. Our compiler supports `strings`, `numbers`, `booleans` and `null`. We will now check for the following types. Remmember we are dealing with single characters so we willl need to put some checks in place else we will be pushing single characters as `tokens`
+Still in the while loop
+
+```js
+const tokenizer = (input) => {
+  // ...
+  while (current < length - 1) {
+    const currentChar = input[current];
+    //...
+
+    // Now we will check for Numbers
+    const NUMBER = /^[0-9]+$/; // Regex to check if character is a number
+    // If it is a number, we create a `token` and add it to `tokens`
+    // We are checking for a single character, but what if we have a value as
+    // `123`, then our tokens will be
+    //
+    // [
+    //   { type: 'number', value: 1 },
+    //   { type: 'number', value: 2 },
+    //   { type: 'number', value: 3 },
+    // ]
+    // Instead of
+    // [
+    //   { type: 'number', value: 123 },
+    // ]
+    // which we don't want. So we create a `number` variable and check if the
+    // next character is a number. If the next character is a number, we add it to the `number` variable
+    // Then add the `number` variable's value as the value in our `token`
+    if (NUMBER.test(currentChar)) {
+      let number = '';
+
+      // Check if the next character is a number
+      while (NUMBER.test(input[current++])) {
+        number += input[current - 1]; // Add the character to `number`
+      }
+
+      // Create a token with type number
+      let token = {
+        type: 'number',
+        value: parseInt(number), // `number` is a string to we convert it to an integer
+      };
+
+      tokens.push(token); // Add the `token` to `tokens` array
+      continue;
     }
   }
 };
