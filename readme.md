@@ -186,10 +186,10 @@ const tokenizer = (input) => {
     }
 
     // We need semicolons They tell us that we are at the end.
-    // We check for semicolons now and also if the semicolon is at the last position
+    // We check for semicolons now and also if the semicolon is at the last but one position
     // We only need the semicolons at the end. Any other position means there
     // An error
-    if (currentChar === ';' && currentChar === input[input.length - 1]) {
+    if (currentChar === ';' && currentChar === input[input.length - 2]) {
       // If the current character is a semicolon, we create a `token`
       let token = {
         type: 'semi',
@@ -516,3 +516,104 @@ const parser = (tokens) => {
   };
 };
 ```
+
+We have checks for `null`, `boolean`,`string` and `number` token types. Let's focus on the remaining ones, `keyword`, `name`, `semi` and `ident`. `ident` will always have a value of `as` so we won't need a node for it. We will just skip it. `semi` also indicates the end of the code so we will ignore it too. We will focus on the `keyword` and `name`
+
+```js
+const parser = () => {
+  // ...
+  const walk = () => {
+    let token = tokens[current];
+    // ...
+
+    // We now check for the `keyword` token type
+    // The presence of a `keyword` token type indicates that we are declaring a variable,
+    // So the AST node won't be the same as that of `number` or `string`.
+    // The node will have a `type` property of `VariableDeclaration`, `kind` property of the keyword
+    // and a `declarations` property which is an array for all the declarations
+    if (token.type === 'keyword') {
+      // New AST Node for  `keyword`
+      let astNode = {
+        type: 'VariableDeclaration',
+        kind: token.value, // The keyword used. `set` or `define`
+        declarations: [], // all the variable declarations.
+      };
+
+      // At this stage, we don't need the `keyword` token again. It's value has been used at the astNode.
+      // So we increase the current and get the next token
+      // Obviously the next one will be the `name` token and we will call the `walk` function again
+      // which will have a token type of `name` now and the returned results will be pushed into
+      // the declarations array
+
+      token = tokens[++current]; // Increase the `current` token counter and get the next token.
+
+      // Check if there is a token and the next token is not a semicolon
+      while (token && token.type !== 'semi') {
+        // if the token is not a semicolon, we add the result of `walk` again into
+        // the node declarations array
+        astNode.declarations.push(walk());
+
+        // We then go to the next token
+        token = tokens[current];
+      }
+
+      // Then we return the AST Node
+      return astNode;
+    }
+
+    // The last is the `name` token type
+    // The `name` token type will have a node of type `VariableDeclarator` and an
+    // `id` which will also be a another node with type `Identifier` and an
+    // `init` with the type of the value.
+    // If the token type is a name, we will increse `current` by two to skip the next value after
+    // `name` which is `ident` and we don't need it.
+    if (token.type === 'name') {
+      current += 2; // Increase by 2 to skip `ident`
+
+      // Declare a new AST Node and recursively call the `walk` function again
+      // Which the result will be placed in the `init` property
+      let astNode = {
+        type: 'VariableDeclarator',
+        id: {
+          type: 'Identifier',
+          name: token.value,
+        },
+        init: walk(), // Call `walk` to return another AST Node and the result is assigned to `init`
+      };
+
+      // Return the AST Node
+      return astNode;
+    }
+  };
+};
+```
+
+We are done with the `walk` function, but the function is just declared in the `parser`, it's not being used by the `parser` so we have to use it.
+
+```js
+const parser = () => {
+  // ..
+  const walk = () => {
+    // ...
+  };
+
+  // We will now declare our AST. We have been building the nodes,
+  // so we have to join the AST as one.
+  // The type of the AST will be `Program` which will indicate the start of the code
+  // And a `body` property which will be an array that will contain all the other AST we have generated.
+  let ast = {
+    type: 'Program',
+    body: [],
+  };
+
+  // We then check if there are token's in the `tokens` array and add thier Node to the main AST
+  while (current < tokens.length) {
+    ast.body.push(walk());
+  }
+
+  // Final return of the parse function.
+  return ast;
+};
+```
+
+There you have it, the `parser` in the flesh. You can use the test case above and pass the tokens to the parser and log the results for yourself.

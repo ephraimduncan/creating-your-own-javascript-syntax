@@ -18,7 +18,7 @@ const tokenizer = (input) => {
       continue;
     }
 
-    if (currentChar === ';') {
+    if (currentChar === ';' && currentChar === input[input.length - 2]) {
       let token = {
         type: 'semi',
         value: ';',
@@ -116,12 +116,11 @@ const parser = (tokens) => {
 
   const walk = () => {
     let token = tokens[current];
-
     if (token.type === 'number') {
       current++;
       let astNode = {
         type: 'NumberLiteral',
-        value: token.type,
+        value: token.value,
       };
       return astNode;
     }
@@ -130,7 +129,7 @@ const parser = (tokens) => {
       current++;
       let astNode = {
         type: 'StringLiteral',
-        value: token.type,
+        value: token.value,
       };
       return astNode;
     }
@@ -139,7 +138,7 @@ const parser = (tokens) => {
       current++;
       let astNode = {
         type: 'BooleanLiteral',
-        value: token.type,
+        value: JSON.parse(token.value),
       };
       return astNode;
     }
@@ -148,9 +147,58 @@ const parser = (tokens) => {
       current++;
       let astNode = {
         type: 'NullLiteral',
-        value: token.type,
+        value: token.value,
       };
       return astNode;
     }
+
+    if (token.type === 'keyword') {
+      let node = {
+        type: 'VariableDeclaration',
+        kind: token.value,
+        declarations: [],
+      };
+      token = tokens[++current];
+      while (token && token.type !== 'semi') {
+        node.declarations.push(walk());
+        token = tokens[current];
+      }
+
+      if (token.type === 'semi') {
+        tokens = tokens.filter((token) => token.type !== 'semi');
+      }
+
+      return node;
+    }
+
+    if (token.type === 'name') {
+      current += 2;
+      let astNode = {
+        type: 'VariableDeclarator',
+        id: {
+          type: 'Identifier',
+          name: token.value,
+        },
+        init: walk(),
+      };
+      return astNode;
+    }
+
+    throw new Error(token.type);
   };
+
+  let ast = {
+    type: 'Program',
+    body: [],
+  };
+
+  while (current < tokens.length) {
+    ast.body.push(walk());
+  }
+
+  return ast;
 };
+
+const tokens = tokenizer('set isEmployed as false');
+console.log(tokens);
+console.dir(parser(tokens), { depth: null });
