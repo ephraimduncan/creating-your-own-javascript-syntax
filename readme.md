@@ -172,7 +172,7 @@ After the initial declarations in the `tokenizer`, we come to the main part. We 
 ```js
 const tokenizer = (input) => {
   // ...
-  while (current < length - 1) {
+  while (current < input.length - 1) {
     // We get the current character first
     const currentChar = input[current];
 
@@ -212,7 +212,7 @@ Still in the while loop
 ```js
 const tokenizer = (input) => {
   // ...
-  while (current < length - 1) {
+  while (current < input.length - 1) {
     const currentChar = input[current];
     //...
 
@@ -267,7 +267,7 @@ Strings will be easy to tackle with first. Each string starts and ends with a `"
 ```js
 const tokenizer = (input) => {
   // ...
-  while (current < length - 1) {
+  while (current < input.length - 1) {
     const currentChar = input[current];
     //...
 
@@ -277,7 +277,7 @@ const tokenizer = (input) => {
       // Initialize an empty strings variable
       let strings = '';
 
-      // Check if the next character is another quote
+      // Check if the next character is not a quote
       while (input[++current] !== '"') {
         // If it is not a quote, it means we still have a string
         strings += input[current]; // Add it to the `strings` variable
@@ -297,4 +297,130 @@ const tokenizer = (input) => {
 };
 ```
 
-// booleans, null and the keywords (set and define) are all letters
+The last check and we are done with our `tokenizer`. The check for letters. `booleans`, `null` and the keywords, `set` and `define` all have characters that will test true for letters so we will use the same approach as the numbers. If the current character is a letter, we will add it to a new variable and check of the next character is also a letter until we meet a non-letter character then we will return.
+
+```js
+const tokenizer = (input) => {
+  // ...
+  while (current < input.length - 1) {
+    const currentChar = input[current];
+    //...
+
+    // Check if the character is a letter
+    const LETTER = /[a-zA-Z]/; // Regex to check if it is a letter
+    if (LETTER.test(currentChar)) {
+      // If the current character is a letter we add it to a `letters` variable
+      let letters = currentChar;
+
+      // Check if the next character is also a letter
+      while (LETTER.test(input[++current])) {
+        // We add it to the `letters` variable if it is
+        letters += input[current];
+      }
+
+      // ...
+      // See below..
+    }
+  }
+};
+```
+
+At this point, we have our `letters` value but we cannot add it to the `tokens` array yet. Each token must have a `type` and a `value` but for letters, they could be different. Our letters could be `true` || `false` which will have a type of `boolean` or the letters could be `set` || `define` which could have a type of `keyword`, so we need another check to check the letters and assign thier token the respective type.
+
+```js
+const tokenizer = (input) => {
+  // ...
+  while (current < input.length - 1) {
+    const currentChar = input[current];
+    //...
+
+    const LETTER = /[a-zA-Z]/;
+    if (LETTER.test(currentChar)) {
+      // ...
+      //
+      // Still in the letter check
+      // At this point, we have a value for our `letters` so we check for thier types.
+      //
+      // We first check if the `letters` is `set` or `define` and we assign the `token` a type `keyword`
+      if (letters === 'set' || letters === 'define') {
+        // Add a `token` to the `tokens` array
+        tokens.push({
+          type: 'keyword',
+          value: letters,
+        });
+
+        continue; // We are done. Start the loop all over again
+      }
+
+      // If the letter is `null`, assign the `token` a type `null`
+      if (letters === 'null') {
+        tokens.push({
+          type: 'null',
+          value: letters,
+        });
+        continue;
+      }
+
+      // If the letter is `null`, assign the `token` a type `ident`
+      if (letters === 'as') {
+        tokens.push({
+          type: 'ident',
+          value: letters,
+        });
+        continue;
+      }
+
+      // If the letter is `true` or `false`, assign the `token` a type `boolean`
+      if (letters === 'true' || letters === 'false') {
+        tokens.push({
+          type: 'boolean',
+          value: letters,
+        });
+        continue;
+      }
+
+      // If we don't know the `letters`, it may be a reference to another variable name or something else.
+      // Assign the `token` a type `boolean`
+      tokens.push({
+        type: 'name',
+        value: letters,
+      });
+
+      continue; // Start the loop again
+    }
+  }
+};
+```
+
+At this point, we are done checking but if the character isn't recognized the our `while` loop will be stuck so we need some error checking in place and finally return the `tokens` from the tokenizer.
+
+```js
+const tokenizer = (input) => {
+  // ...
+  while (current < input.length - 1) {
+    // ....
+    //
+    // If the character reaches this point, then its not valid so we throw a TypeError
+    // with the character and location else we will be stuck in an infinite loop
+    throw new TypeError('Unknown Character: ' + currentChar + ' ' + current);
+  }
+
+  // Return the `tokens` from the `tokenizer`
+  return tokens;
+};
+```
+
+We are done with the `tokenizer`. All the code at this point can be found [here](github.com/dephraiim).
+
+```js
+// You can test your tokenizer with
+const tokens = tokenizer('set isEmployed as false');
+
+// [
+//   { type: 'keyword', value: 'set' },
+//   { type: 'name', value: 'isEmployed' },
+//   { type: 'ident', value: 'as' },
+//   { type: 'boolean', value: 'false' },
+//   { type: 'semi', value: ';' },
+// ]
+```

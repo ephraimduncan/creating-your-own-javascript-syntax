@@ -9,7 +9,7 @@ const tokenizer = (input) => {
     input = input + '; ';
   }
 
-  while (current < length - 1) {
+  while (current < input.length - 1) {
     const currentChar = input[current];
 
     const WHITESPACE = /\s+/;
@@ -55,5 +55,57 @@ const tokenizer = (input) => {
       current++;
       continue;
     }
+
+    const LETTER = /[a-zA-Z]/;
+    if (LETTER.test(currentChar)) {
+      let letters = currentChar;
+
+      while (LETTER.test(input[++current])) {
+        letters += input[current];
+      }
+
+      if (letters === 'set' || letters === 'define') {
+        tokens.push({
+          type: 'keyword',
+          value: letters,
+        });
+        continue;
+      }
+
+      if (letters === 'null') {
+        tokens.push({
+          type: 'null',
+          value: letters,
+        });
+        continue;
+      }
+
+      if (letters === 'as') {
+        tokens.push({
+          type: 'ident',
+          value: letters,
+        });
+        continue;
+      }
+
+      if (letters === 'true' || letters === 'false') {
+        tokens.push({
+          type: 'boolean',
+          value: letters,
+        });
+        continue;
+      }
+
+      tokens.push({
+        type: 'name',
+        value: letters,
+      });
+
+      continue;
+    }
+
+    throw new TypeError('Unknown Character: ' + currentChar + ' ' + current);
   }
+
+  return tokens;
 };
