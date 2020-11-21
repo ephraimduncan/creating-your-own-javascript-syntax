@@ -259,3 +259,42 @@ const tokenizer = (input) => {
   }
 };
 ```
+
+Now that we have numbers underway, the next on our list is `strings`, `booleans` and `null` values. If we used the same approach for the semicolon and add a token for every character, we could face the same problem where we won't the full token value so we will a different approach similiar to the number check.
+
+Strings will be easy to tackle with first. Each string starts and ends with a `"` so based on the same approach for numbers, we check if a character is a `"`, If it is, we will add every value that comes after the quote(`"`) until we meet another quote indicating the end of the string.
+
+```js
+const tokenizer = (input) => {
+  // ...
+  while (current < length - 1) {
+    const currentChar = input[current];
+    //...
+
+    // Check if character is a string
+    if (currentChar === '"') {
+      // If the current character is a quote, that means we have a string
+      // Initialize an empty strings variable
+      let strings = '';
+
+      // Check if the next character is another quote
+      while (input[++current] !== '"') {
+        // If it is not a quote, it means we still have a string
+        strings += input[current]; // Add it to the `strings` variable
+      }
+
+      // Create a token with property type string and a value with the `strings` value
+      let token = {
+        type: 'string',
+        value: strings,
+      };
+
+      tokens.push(token); // Add the `token` to the `tokens` array
+      current++;
+      continue;
+    }
+  }
+};
+```
+
+// booleans, null and the keywords (set and define) are all letters

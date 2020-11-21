@@ -41,5 +41,19 @@ const tokenizer = (input) => {
       tokens.push(token);
       continue;
     }
+
+    if (currentChar === '"') {
+      let string = '';
+      while (input[++current] !== '"') {
+        string += input[current];
+      }
+      let token = {
+        type: 'string',
+        value: string,
+      };
+      tokens.push(token);
+      current++;
+      continue;
+    }
   }
 };
