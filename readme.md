@@ -136,7 +136,6 @@ Let's write some code. 😋
 Create a new directory and run `npm init -y` and create a new javascript file with any filename of your choice.
 
 In general, we will have 5 main functions in our code
-// Photoshop of stages with their functions
 
 - Compiler
   - Parsing
@@ -379,8 +378,8 @@ const tokenizer = (input) => {
         continue;
       }
 
-      // If we don't know the `letters`, it may be a reference to another variable name or something else.
-      // Assign the `token` a type `boolean`
+      // If we don't know the `letters`, it is the variable name.
+      // Assign the `token` a type `name`
       tokens.push({
         type: 'name',
         value: letters,
@@ -423,4 +422,97 @@ const tokens = tokenizer('set isEmployed as false');
 //   { type: 'boolean', value: 'false' },
 //   { type: 'semi', value: ';' },
 // ]
+```
+
+### `parser`
+
+Now that the heavy lifting has been done for us in the `tokenizer`, we move to the `parser`. The `parser` takes the `tokens` produced by the `tokenizer` and modifies them into an AST. Out parser will have a `walk` function. The `walk` function will take the current `token` and return the AST Node for that specific `token`.
+
+If we had a `token`
+
+```js
+{
+  type: "number",
+  value: 1024
+}
+```
+
+The AST Node will be:
+
+```js
+{
+  type: "NumberLiteral",
+  value: 1024
+}
+```
+
+The code for our `parser`
+
+```js
+const parser = (tokens) => {
+  // We will declare a `current` variable to get the current `token`
+  let current = 0;
+
+  // Then our parser will have a walk function
+  const walk = () => {};
+};
+```
+
+The `walk` function will be a recursive function. We first get the current `token`, check the `type` of the `token` and return an AST Node based on the `type`.
+
+```js
+const parser = (tokens) => {
+  // ...
+  const walk = () => {
+    // Get the current `token` with the `current` variable
+    let token = tokens[current];
+
+    // From here, we will check for the `type` of each token and return a node.
+    if (token.type === 'number') {
+      // Our token is a `number`,
+      // We increase the current counter
+      current++;
+      // We create a type `NumberLiteral` and the value as the token's `value`
+      let astNode = {
+        type: 'NumberLiteral',
+        value: token.value,
+      };
+
+      // We return the node
+      return astNode;
+    }
+
+    // We will take the same steps for the `boolean`, `null` and `string` token types
+    // Check the value, Increment the counter, return a new node
+    // Check for a string token
+    if (token.type === 'string') {
+      current++;
+      let astNode = {
+        type: 'StringLiteral',
+        value: token.type,
+      };
+      return astNode;
+    }
+
+    // Check for boolean token
+    if (token.type === 'boolean') {
+      current++;
+      let astNode = {
+        type: 'BooleanLiteral',
+        value: token.type,
+      };
+      return astNode;
+    }
+
+    // Check for null token
+    if (token.type === 'null') {
+      current++;
+      let astNode = {
+        type: 'NullLiteral',
+        value: token.type,
+      };
+      return astNode;
+    }
+  };
+};
 ```

@@ -109,3 +109,48 @@ const tokenizer = (input) => {
 
   return tokens;
 };
+
+// parser
+const parser = (tokens) => {
+  let current = 0;
+
+  const walk = () => {
+    let token = tokens[current];
+
+    if (token.type === 'number') {
+      current++;
+      let astNode = {
+        type: 'NumberLiteral',
+        value: token.type,
+      };
+      return astNode;
+    }
+
+    if (token.type === 'string') {
+      current++;
+      let astNode = {
+        type: 'StringLiteral',
+        value: token.type,
+      };
+      return astNode;
+    }
+
+    if (token.type === 'boolean') {
+      current++;
+      let astNode = {
+        type: 'BooleanLiteral',
+        value: token.type,
+      };
+      return astNode;
+    }
+
+    if (token.type === 'null') {
+      current++;
+      let astNode = {
+        type: 'NullLiteral',
+        value: token.type,
+      };
+      return astNode;
+    }
+  };
+};
