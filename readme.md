@@ -489,7 +489,7 @@ const parser = (tokens) => {
       current++;
       let astNode = {
         type: 'StringLiteral',
-        value: token.type,
+        value: token.value,
       };
       return astNode;
     }
@@ -499,7 +499,7 @@ const parser = (tokens) => {
       current++;
       let astNode = {
         type: 'BooleanLiteral',
-        value: token.type,
+        value: token.value,
       };
       return astNode;
     }
@@ -509,7 +509,7 @@ const parser = (tokens) => {
       current++;
       let astNode = {
         type: 'NullLiteral',
-        value: token.type,
+        value: token.value,
       };
       return astNode;
     }
@@ -550,12 +550,16 @@ const parser = () => {
       // Check if there is a token and the next token is not a semicolon
       while (token && token.type !== 'semi') {
         // if the token is not a semicolon, we add the result of `walk` again into
-        // the node declarations array
+        // the AST Node `declarations` array
         astNode.declarations.push(walk());
 
         // We then go to the next token
         token = tokens[current];
       }
+
+      // From here, we don't need the semicolon again, so we remove it from the
+      // `tokens` array
+      tokens = tokens.filter((token) => token.type !== 'semi');
 
       // Then we return the AST Node
       return astNode;
@@ -584,6 +588,9 @@ const parser = () => {
       // Return the AST Node
       return astNode;
     }
+
+    // We throw an error again for an unknown type
+    throw new Error(token.type);
   };
 };
 ```
@@ -616,4 +623,4 @@ const parser = () => {
 };
 ```
 
-There you have it, the `parser` in the flesh. You can use the test case above and pass the tokens to the parser and log the results for yourself.
+There you have it, the `parser` in the flesh. You can use the test case above and pass the tokens to the parser and log the results for yourself. You can get all the code up to this point [here](github.com/dephraiim)

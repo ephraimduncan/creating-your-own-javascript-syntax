@@ -164,9 +164,7 @@ const parser = (tokens) => {
         token = tokens[current];
       }
 
-      if (token.type === 'semi') {
-        tokens = tokens.filter((token) => token.type !== 'semi');
-      }
+      tokens = tokens.filter((token) => token.type !== 'semi');
 
       return node;
     }
