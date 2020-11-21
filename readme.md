@@ -218,22 +218,27 @@ const tokenizer = (input) => {
 
     // Now we will check for Numbers
     const NUMBER = /^[0-9]+$/; // Regex to check if character is a number
-    // If it is a number, we create a `token` and add it to `tokens`
-    // We are checking for a single character, but what if we have a value as
-    // `123`, then our tokens will be
+    // If we use the same method above for the semicolons,
+    // We create a number `token` and add it to `tokens`, we end up with a token for
+    // each single number character instead of the number as a whole.
+    // For example, if we have a number value of `123`, then our tokens will be
     //
     // [
     //   { type: 'number', value: 1 },
     //   { type: 'number', value: 2 },
     //   { type: 'number', value: 3 },
     // ]
+    //
     // Instead of
+    //
     // [
     //   { type: 'number', value: 123 },
     // ]
-    // which we don't want. So we create a `number` variable and check if the
-    // next character is a number. If the next character is a number, we add it to the `number` variable
+    // which we don't want.
+    // So we create a `number` variable and check if the next character is a number.
+    // If the next character is a number, we add it to the `number` variable
     // Then add the `number` variable's value as the value in our `token`
+    // The add the `token` to our `tokens` array
     if (NUMBER.test(currentChar)) {
       let number = '';
 
