@@ -1,6 +1,6 @@
 # Creating Your Own JavaScript Syntax
 
-So today we are going to create our own syntax in JavaScript. For simplicity sake and easy understanding, we will stick to a single javascript structure. Variable Declaration. We are going to implement a new syntax for declaring variables in JavaScript. The new syntax definition will be below.
+Today we are going to create our own syntax in JavaScript. For simplicity sake and easy understanding, we will stick to a single javascript structure. Variable Declaration. We are going to implement a new syntax for declaring variables in JavaScript. The new syntax definition will be below.
 
 ```js
 // `set` and `define` to replace `let` and `const`
@@ -137,15 +137,7 @@ Create a new directory and run `npm init -y` and create a new javascript file wi
 
 In general, we will have 5 main functions in our code
 
-- Compiler
-  - Parsing
-    - `tokenizer`
-    - `parser`
-  - Transformation
-    - `traverser`
-    - `transformer`
-  - Code Generation
-    - `generator`
+![Compiler](./img/compiler)
 
 ### `tokenizer`
 
@@ -623,4 +615,4 @@ const parser = () => {
 };
 ```
 
-There you have it, the `parser` in the flesh. You can use the test case above and pass the tokens to the parser and log the results for yourself. You can get all the code up to this point [here](github.com/dephraiim)
+There you have it, the `parser` in the flesh. You can use the test case for the `tokenizer` above and pass the tokens to the parser and log the results for yourself. You can get all the code up to this point [here](github.com/dephraiim)
