@@ -616,3 +616,92 @@ const parser = () => {
 ```
 
 There you have it, the `parser` in the flesh. You can use the test case for the `tokenizer` above and pass the tokens to the parser and log the results for yourself. You can get all the code up to this point [here](github.com/dephraiim)
+
+### `traverser`
+
+It's time for our `traverser`. The `traverser` will take the `ast` from the `parser` and a `visitor`. The `visitor` will have objects with names of the various AST Node types and each object will have an `enter` method. While traversing the AST, when we get to a node with a matching visitor object, we call the `enter` method on that object.
+
+```js
+// Example Visitor
+let visitor = {
+  VariableDeclaration: {
+    enter() {},
+  },
+};
+```
+
+```js
+// Declaring the `traverser`
+const traverser = (ast, visitor) => {};
+```
+
+The `traverser` will have two main methods, `traverseArray` and `traverseNode`. `traverseArray` will call `traverseNode` on each node in a node array. `traverseNode` will take an node and it's parent node and call the visitor method on the node if there is one.
+
+```js
+const traverser = (ast, visitor) => {
+  // `traverseArray` function will allow us to iterate over an array of nodes and
+  // call the `traverseNode` function
+  const traverseArray = (array, parent) => {
+    array.forEach((child) => {
+      traverseNode(child, parent);
+    });
+  };
+};
+```
+
+Now that we have the `traverseArray`, we can proceed to the main `traverseNode` function.
+
+```js
+const traverser = (ast, visitor) => {
+  // ...
+
+  // In the `traverseNode`, will get the  node `type` object and call the `enter`
+  // method if the object is present
+  // Then recursively call the `traverseNode` again on every child node
+  const traverseNode = (node, parser) => {
+    // Get the node object on the visitor passed to the `traverser`
+    let objects = visitor[node.type];
+
+    // Check if the node type object is present and call the enter method
+    // with the node and the parent
+    if (objects && objects.enter) {
+      methods.enter(node, parent);
+    }
+
+    // At this point, we will call the `traverseNode` and `traverseArray` methods recursively
+    // based on each of the given node types
+    switch (node.type) {
+      // We'll start with our top level `Program` and call the `traverseArray`
+      // on the `body` property to call each node in the array with  `traverseNode`
+      case 'Program':
+        traverseArray(node.body, node);
+        break;
+
+      //We do the same to `VariableDeclaration` and traverse the `declarations`
+      case 'VariableDeclaration':
+        traverseArray(node.declarations, node);
+        break;
+
+      // Next is the `VariableDecalarator`. We traverse the `init`
+      case 'VariableDeclarator':
+        traverseNode(node.init, node);
+        break;
+
+      // The remaining types don't have any child nodes so we just break
+      case 'NumberLiteral':
+      case 'StringLiteral':
+      case 'NullLiteral':
+      case 'BooleanLiteral':
+        break;
+
+      // We throw an error if we don't know the `type`
+      default:
+        throw new TypeError(node.type);
+    }
+  };
+
+  // We now start the `traverser` with a call to the `traverseNode` with the
+  // `ast` and null, since the ast does not have a parent
+  traverseNode(ast, null);
+};
+```

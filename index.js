@@ -197,6 +197,44 @@ const parser = (tokens) => {
   return ast;
 };
 
-const tokens = tokenizer('set isEmployed as false');
-console.log(tokens);
-console.dir(parser(tokens), { depth: null });
+// traverser
+const traverser = (ast, visitor) => {
+  const traverseArray = (array, parent) => {
+    array.forEach((child) => {
+      traverseNode(child, parent);
+    });
+  };
+
+  const traverseNode = (node, parent) => {
+    let objects = visitor[node.type];
+
+    if (objects && objects.enter) {
+      objects.enter(node, parent);
+    }
+
+    switch (node.type) {
+      case 'Program':
+        traverseArray(node.body, node);
+        break;
+
+      case 'VariableDeclaration':
+        traverseArray(node.declarations, node);
+        break;
+
+      case 'VariableDeclarator':
+        traverseNode(node.init, node);
+        break;
+
+      case 'NumberLiteral':
+      case 'StringLiteral':
+      case 'NullLiteral':
+      case 'BooleanLiteral':
+        break;
+
+      default:
+        throw new TypeError(node.type);
+    }
+  };
+
+  traverseNode(ast, null);
+};

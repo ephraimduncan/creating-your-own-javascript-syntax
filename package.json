@@ -1,12 +1,9 @@
 {
-  "name": "setlang",
+  "name": "set",
   "version": "0.0.0-development",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "keywords": [],
   "author": "Ephraim Atta-Duncan <ephraimduncan68@gmail.com>",
   "license": "MIT",
-  "description": ""
+  "description": "create your own JavaScript syntax"
 }
