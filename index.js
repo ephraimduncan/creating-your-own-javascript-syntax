@@ -258,7 +258,27 @@ const transformer = (ast) => {
   return ast;
 };
 
-// test
-console.dir(transformer(parser(tokenizer('set age as "name"'))), {
-  depth: null,
-});
+// generator
+const generator = (node) => {
+  switch (node.type) {
+    case 'NumberLiteral':
+    case 'BooleanLiteral':
+    case 'NullLiteral':
+      return node.value;
+
+    case 'StringLiteral':
+      return `"${node.value}"`;
+
+    case 'Identifier':
+      return node.name;
+
+    case 'VariableDeclarator':
+      return generator(node.id) + ' = ' + generator(node.init) + ';';
+
+    case 'VariableDeclaration':
+      return node.kind + ' ' + node.declarations.map(generator).join(' ');
+
+    case 'Program':
+      return node.body.map(generator).join('\n');
+  }
+};
