@@ -882,3 +882,7 @@ const _js = compiler(_code);
 console.log(js); // let age = 18;
 console.log(_js); // const name = "Duncan";
 ```
+
+## Conclusion
+
+Congratulations once again on making it to the end 🥳🥳🥳. Inasmuch as we wrote all this, it's kind of useless. No one will use it in the real world and also, if we used it in a real javascript code, we will get all sort of errors, unless of course we had a way to use it in the real world. I am planning on building a babel plugin so check back in a few weeks. I learnt a lot. I hope you did. Thank you for reading. If you meet any errors or have any questions, you can find me on [twitter](https://twitter.com/dephraiim).
