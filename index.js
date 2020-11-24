@@ -280,5 +280,8 @@ const generator = (node) => {
 
     case 'Program':
       return node.body.map(generator).join('\n');
+
+    default:
+      throw new TypeError(node.type);
   }
 };

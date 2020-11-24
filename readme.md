@@ -838,6 +838,10 @@ const generator = (ast) => {
     // and run them through the `generator` and join them with a newline.
     case 'Program':
       return node.body.map(generator).join('\n'); // let age = 18;
+
+    //  We'll throw an error if we don't know the node
+    default:
+      throw new TypeError(node.type);
   }
 };
 ```
