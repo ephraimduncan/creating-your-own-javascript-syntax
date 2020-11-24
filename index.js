@@ -285,3 +285,12 @@ const generator = (node) => {
       throw new TypeError(node.type);
   }
 };
+
+// compiler
+const compiler = (code) => {
+  const tokens = tokenizer(code);
+  const ast = parser(tokens);
+  const mast = transformer(ast);
+  const output = generator(mast);
+  return output;
+};

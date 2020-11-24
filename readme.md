@@ -847,3 +847,38 @@ const generator = (ast) => {
 ```
 
 Finally, we are done with our `generator` and all the three stages. You can get all the code up till this point [here](https://github.com/dephraiim).
+
+### `compiler`
+
+Congratulations if you really made it this far. There's only one thing left to do. We need to link all the functions we created and combine it into one single function. We'll name it as the `compiler`
+
+```js
+const compiler = (code) => {
+  // Take the code and convert it into token
+  const token = tokenizer(code);
+
+  // Take the tokens and parse the into an AST
+  const ast = parser(tokens);
+
+  // Modify the ast into a new one
+  const mast = transformer(ast);
+
+  // Generate the code from the modified AST
+  const output = generator(mast);
+
+  // Return the new compiled code
+  return output;
+};
+```
+
+We can now test our baby `compiler`
+
+```js
+let code = 'set age as 18;';
+let _code = 'define name as "Duncan"';
+const js = compiler(code);
+const _js = compiler(_code);
+
+console.log(js); // let age = 18;
+console.log(_js); // const name = "Duncan";
+```
