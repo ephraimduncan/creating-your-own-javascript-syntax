@@ -701,7 +701,79 @@ const traverser = (ast, visitor) => {
   };
 
   // We now start the `traverser` with a call to the `traverseNode` with the
-  // `ast` and null, since the ast does not have a parent
+  // `ast` and null, since the ast does not have a parent node.
   traverseNode(ast, null);
+};
+```
+
+That's it for our `traverser`. You can get all the code up to this point [here](github.com/dephraiim).
+
+### `transformer`
+
+Next is our `transformer` which will take the AST and modify the AST and return it. Our `transformer` will have a `visitor` object and it will traverse the AST passed as an argument with the visitor and return the modified AST
+
+Since we are only dealing with Variable Declaration's, our visitor will have only one object,`VariableDeclaration` and will change the value of the `kind` to the respective equivalent.
+
+```js
+const transformer = (ast) => {
+  // We will start by creating the `visitor` object
+  const visitor = {
+    // Then we will create the `VariableDeclaration` object in the `visitor`
+    VariableDeclaration: {
+      // Here, we will have the `enter` method which will take the `node` and the `parent`
+      // Although we won't use the parent (Simplicity)
+      enter(node, parent) {
+        // Check if the VariableDeclaration has a `kind` property
+        // If it has, we change based on the previous one
+        // `set` -> `let`
+        // `define` -> `const`
+        if (node.kind) {
+          if (node.kind === 'set') {
+            node.kind = 'let'; // Set it to `let`
+          } else {
+            node.kind = 'const';
+          }
+        }
+      },
+    },
+  };
+};
+```
+
+That's it for our `visitor`. Although we could have done more, like things not related to variable declaration. We could have added a `NumberLiteral` object to multiply every number by 2 or another method to make every string in a `String` uppercase. `visitor` is where the mutations and the modifications take place.
+
+```js
+let visitor = {
+  // Multiply every number by 2
+  NumberLiteral: {
+    enter(node) {
+      if (typeof node.value === 'number') {
+        node.value *= 2;
+      }
+    },
+  },
+
+  // Uppercase every string value
+  StringLiteral: {
+    enter(node) {
+      if (typeof node.value === 'string') {
+        node.value = node.value.toUpperCase();
+      }
+    },
+  },
+};
+```
+
+We are done with the `visitor` but not the whole `transformer`. We need to use the `visitor` we created with the `traverser` to modify our AST and return the modified AST
+
+```js
+const transformer = (ast) => {
+  // ...visitor
+
+  // We will call the `traverser` with the `ast` and the `visitor`
+  traverser(ast, visitor);
+
+  // Finally we return the AST, which has been modified now.
+  return ast;
 };
 ```

@@ -238,3 +238,27 @@ const traverser = (ast, visitor) => {
 
   traverseNode(ast, null);
 };
+
+// transformer
+const transformer = (ast) => {
+  let visitor = {
+    VariableDeclaration: {
+      enter(node) {
+        if (node.kind && node.kind === 'set') {
+          node.kind = 'let';
+        } else {
+          node.kind = 'const';
+        }
+      },
+    },
+  };
+
+  traverser(ast, visitor);
+
+  return ast;
+};
+
+// test
+console.dir(transformer(parser(tokenizer('set age as "name"'))), {
+  depth: null,
+});
