@@ -1,5 +1,7 @@
 # Creating Your Own JavaScript Syntax
 
+_Image by [Maggie Appleton](https://maggieappleton.com/)_
+
 Today we are going to create our own syntax in JavaScript. For simplicity sake and easy understanding, we will stick to a single javascript structure. Variable Declaration. We are going to implement a new syntax for declaring variables in JavaScript. The new syntax definition will be below.
 
 ```js
